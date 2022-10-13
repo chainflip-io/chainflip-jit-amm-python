@@ -14,7 +14,7 @@ First, ensure you have [Poetry](https://python-poetry.org) installed
 
 ```bash
 git clone git@github.com:chainflip-io/python-uniswap-v3.git
-cd python-uniswap-v3
+cd python-jit-amm
 poetry shell
 poetry install
 ```
