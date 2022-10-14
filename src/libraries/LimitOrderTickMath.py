@@ -2,8 +2,10 @@ from Shared import *
 import TickMath
 import FullMath
 
-# NOTE: There might a better way to do this than squaring the sqrtPrice but it's not really relevant.
-# Get price at tick for LOs
+# Calculating the price at a tick.
+# NOTE: There is probably a better way to do this since getting the sqrtPrice and then squaring it
+# won't give full precision. Something similar to what is done in TickMath is better but we don't
+# care too much about it for this mode.
 def getPriceAtTick(tick):
     checkInt24(tick)
     sqrtPriceX96 = TickMath.getSqrtRatioAtTick(tick)

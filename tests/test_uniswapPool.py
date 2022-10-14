@@ -8,13 +8,13 @@ import SwapMath, TickMath
 
 import copy
 
+
 @pytest.fixture
 def accounts(ledger):
     return getAccountsFromLedger(ledger)
 
 
 def getAccountsFromLedger(l):
-    # return [ledger.accounts[account] for account in ledger.accounts.keys()]
     # list of raw addresses
     return list(l.accounts.keys())
 
@@ -66,7 +66,6 @@ def pools0():
 @pytest.fixture
 def pools1():
     return ChainflipPool
-
 
 
 def createPool(TEST_POOLS, feeAmount, tickSpacing, ledger):

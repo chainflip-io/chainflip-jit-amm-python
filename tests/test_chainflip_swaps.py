@@ -5,6 +5,7 @@ from UniswapV3PoolSwaps import swapsSnapshot
 from ChainflipPool import ChainflipPool
 from SharedLimitOrder import *
 
+
 @pytest.fixture(params=[*range(0, 25, 1)])
 def TEST_POOLS(request, accounts, ledger):
     poolFixture = request.getfixturevalue("poolCF{}".format(request.param))
@@ -188,16 +189,12 @@ def test_uniswap_swaps(TEST_POOLS):
             # should be the same or better, but not worse.
             if testCase["zeroForOne"]:
                 if not dict["executionPrice"] in ["Infinity", "-Infinity", "NaN"]:
-                    decimalPoints = (
-                        Decimal(dict["executionPrice"]).as_tuple().exponent
-                    )
+                    decimalPoints = Decimal(dict["executionPrice"]).as_tuple().exponent
                     assert float(dict["executionPrice"]) < round(
                         executionPrice, -decimalPoints
                     )
                 if not (uniswapPoolLimit and chainflipPoolLimit):
-                    decimalPoints = (
-                        Decimal(dict["poolPriceAfter"]).as_tuple().exponent
-                    )
+                    decimalPoints = Decimal(dict["poolPriceAfter"]).as_tuple().exponent
                     assert float(dict["poolPriceAfter"]) < formatPriceWithPrecision(
                         slot0After.sqrtPriceX96, -decimalPoints
                     )
@@ -205,16 +202,12 @@ def test_uniswap_swaps(TEST_POOLS):
 
             else:
                 if not dict["executionPrice"] in ["Infinity", "-Infinity", "NaN"]:
-                    decimalPoints = (
-                        Decimal(dict["executionPrice"]).as_tuple().exponent
-                    )
+                    decimalPoints = Decimal(dict["executionPrice"]).as_tuple().exponent
                     assert float(dict["executionPrice"]) > round(
                         executionPrice, -decimalPoints
                     )
                 if not (uniswapPoolLimit and chainflipPoolLimit):
-                    decimalPoints = (
-                        Decimal(dict["poolPriceAfter"]).as_tuple().exponent
-                    )
+                    decimalPoints = Decimal(dict["poolPriceAfter"]).as_tuple().exponent
                     assert float(dict["poolPriceAfter"]) > formatPriceWithPrecision(
                         slot0After.sqrtPriceX96, -decimalPoints
                     )
@@ -223,31 +216,23 @@ def test_uniswap_swaps(TEST_POOLS):
             # Now execution price should be the same than the pool with noLO
             if testCase["zeroForOne"]:
                 if not dict["executionPrice"] in ["Infinity", "-Infinity", "NaN"]:
-                    decimalPoints = (
-                        Decimal(dict["executionPrice"]).as_tuple().exponent
-                    )
+                    decimalPoints = Decimal(dict["executionPrice"]).as_tuple().exponent
                     assert float(dict["executionPrice"]) == round(
                         executionPrice, -decimalPoints
                     )
-                decimalPoints = (
-                    Decimal(dict["poolPriceAfter"]).as_tuple().exponent
-                )
+                decimalPoints = Decimal(dict["poolPriceAfter"]).as_tuple().exponent
                 assert float(dict["poolPriceAfter"]) == formatPriceWithPrecision(
                     slot0After.sqrtPriceX96, -decimalPoints
                 )
                 assert float(dict["tickAfter"]) == slot0After.tick
             else:
                 if not dict["executionPrice"] in ["Infinity", "-Infinity", "NaN"]:
-                    decimalPoints = (
-                        Decimal(dict["executionPrice"]).as_tuple().exponent
-                    )
+                    decimalPoints = Decimal(dict["executionPrice"]).as_tuple().exponent
                     assert float(dict["executionPrice"]) == round(
                         executionPrice, -decimalPoints
                     )
                 if not (uniswapPoolLimit and chainflipPoolLimit):
-                    decimalPoints = (
-                        Decimal(dict["poolPriceAfter"]).as_tuple().exponent
-                    )
+                    decimalPoints = Decimal(dict["poolPriceAfter"]).as_tuple().exponent
                     assert float(dict["poolPriceAfter"]) == formatPriceWithPrecision(
                         slot0After.sqrtPriceX96, -decimalPoints
                     )

@@ -121,8 +121,8 @@ def calculateAmounts(amountOut, liquidity, oneMinusPercSwap, priceX96, zeroForOn
 
     auxPercSwapDecrease = percSwapDecrease
 
-    # NOTE: Here is where precision is lost because oneMinusPercSwap can be 0.XYZ while percSwapDecrease can be 0.00000ZYX.
-    # The precision that oneMinusPercSwap can store wil depend on how close to one it is (floating point precision).
+    # NOTE: Here is where precision can be lost because oneMinusPercSwap can be 0.XYZ while percSwapDecrease can be 0.00000ZYX.
+    # The precision that oneMinusPercSwap can store will depend on how close to zero it is (floating point precision).
     # We have to use the oneMinusPercSwap - initial to calculate amountIn and Out instead of percSwapDecrease because
     # precision is lost in the operation as explained above.
 
@@ -152,15 +152,15 @@ def calculateAmounts(amountOut, liquidity, oneMinusPercSwap, priceX96, zeroForOn
     )
 
     # Should recalculate amountIn to then take abs(amountRemaining) - amountIn as fees.
-    # NOTE: There are some "issues" in extreme prices (where amountOut=0), where if recalculated amountIn = Zero, which
-    # then causes all amountIn to be taken as fee but no swap has happened. If it weren't recalculated, it would stay as
+    # NOTE: There are some special behaviours in extreme prices (where amountOut=0), where if recalculated then amountIn = Zero,
+    # which then causes all amountIn to be taken as fee but no swap has happened. If it weren't recalculated, it would stay as
     # amountIn, which would be money inside the pool. But since the position hasn't been affected I believe it's correct
     # to take it as fees.
 
     # NOTE: The issue here is that amountOut being rounded down causes amountIn to not get rounded up properly. That impacts the burn
     # calculation and potentially (when no fees at least) in some case the LP gets 1 token more than the pool has.
     # This pops up in the test_precision_zeroForOne and test_precision_oneForZero tests.
-    #  Might not be an issue with fees and this might be unnecessary. As a workaround for now we use the amountOut rounded up for the
+    # Might not be an issue with fees and this might be unnecessary. As a workaround for now we use the amountOut rounded up for the
     # calculation of amountIn. Same thing implemented in Position.
     amountOutRoundedUp = LimitOrderMath.getAmountSwappedFromTickPercentatgeRoundUp(
         percSwapDecrease, oneMinusPercSwap, liquidity
