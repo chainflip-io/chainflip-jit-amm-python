@@ -36,7 +36,6 @@ def getAmountSwappedFromTickPercentatge(
     return amountSwappedPrev
 
 
-# TODO: To merge this with getAmountSwappedFromTickPercentatge if the solution works
 def getAmountSwappedFromTickPercentatgeRoundUp(
     percSwapChange, oneMinusPercSwap, liquidityGross
 ):
