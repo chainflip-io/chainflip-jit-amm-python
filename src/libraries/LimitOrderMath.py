@@ -9,8 +9,8 @@ def calculateAmount1LO(amountInToken0, priceX96, roundUp):
     if roundUp:
         return FullMath.mulDivRoundingUp(amountInToken0, priceX96, FixedPoint96_Q96)
     else:
-        # NOTE: Not using MulDiv because of the potential overflow when called by computeLimitSwap. We let
-        # it overflow and cap it afterwards. If done in a low-language language (Sol/Rust) we need to
+        # NOTE: Not using MulDiv because of the potential overflow when called by LimitcomputeSwapStep. We let
+        # it overflow and cap it afterwards. If done in other languages (Pyth/Rust) we need to
         # accomodate for that or do it in a slightly different way (e.g. mulDiv handling larger uint)
         return (amountInToken0 * priceX96) // FixedPoint96_Q96
 
@@ -21,8 +21,8 @@ def calculateAmount0LO(amountInToken1, priceX96, roundUp):
         # Should never be divided by zero because it is not allowed to mint positions at price 0.
         return FullMath.mulDivRoundingUp(amountInToken1, FixedPoint96_Q96, priceX96)
     else:
-        # NOTE: Not using MulDiv because of the potential overflow when called by computeLimitSwap. We let
-        # it overflow and cap it afterwards. If done in a low-language language (Sol/Rust) we need to
+        # NOTE: Not using MulDiv because of the potential overflow when called by LimitcomputeSwapStep. We let
+        # it overflow and cap it afterwards. If done in other languages (Pyth/Rust) we need to
         # accomodate for that or do it in a slightly different way (e.g. mulDiv handling larger uint)
         return (amountInToken1 * FixedPoint96_Q96) // priceX96
 

@@ -264,8 +264,8 @@ class ChainflipPool(UniswapPool):
             self.ledger.transferToken(self, recipient, self.token1, amountPos1)
 
         # Clear the position for bookkeeping purposes
-        # NOTE: We could leave the position as UniSwap does. However, Solidity's memory/gas usage doesn't really
-        # depend on clearing positions. In Python (and Rust) this matters so we would rather clear the positions.
+        # NOTE: We could leave the position as UniSwap does. However, Solidity's memory/gas usage doesn't really depend
+        # on clearing positions. In other languagues (Pyth/Rust) this matters so we would rather clear the positions.
         if position.liquidity == 0:
             # We should get the hash when getLimit is calculated before
             del self.limitOrders[key]
@@ -627,7 +627,8 @@ class ChainflipPool(UniswapPool):
 # there might be crossed ticks from the previous swap loops. Therefore we must check for crossed ticks and return
 # only the next tick with oneMinusPercSwap > 0
 # Returning initialized bool signaling whether it should be used or not.
-# NOTE: This is probably far from the best efficient way, but this probably will be done very differently in Rust anyway.
+# NOTE: This is probably not the best efficient way, but this probably will be done very differently in the real AMM
+# smart contract implementation anyway. Functionality should be equivalent and it's alright for this model.
 def nextLimitTick(tickMapping, lte, currentTick):
     checkInputTypes(bool=(lte), int24=(currentTick))
 

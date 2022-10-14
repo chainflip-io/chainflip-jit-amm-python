@@ -27,7 +27,6 @@ def computeSwapStep(
             amountRemaining, ONE_IN_PIPS - feePips, ONE_IN_PIPS
         )
         if zeroForOne:
-            # This might overflow - maybe to handle it differently in Rust (here we cap it afterwards)
             amountOut = LimitOrderMath.calculateAmount1LO(
                 amountRemainingLessFee, priceX96, False
             )
