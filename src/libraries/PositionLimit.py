@@ -76,7 +76,7 @@ def update(
 
     # NOTE: TokensOwed can be > MAX_UINT128 and < MAX_UINT256. Uniswap cast tokensOwed into uint128. This in itself
     # is an overflow and it can overflow again when adding self.tokensOwed0 += tokensOwed0. Uniswap finds this
-    # acceptable to save gas. Is this OK for us?
+    # acceptable to save gas and it is kept that way.
 
     # Mimic Uniswap's solidity code overflow - uint128(tokensOwed0)
     if tokensOwed > MAX_UINT128:
@@ -128,8 +128,7 @@ def update(
             # Left term would give is the maximum amount (upper limit) that might have been swapped in the pool including new liquidity.
             # On the right, the amount swapped of that same token before this new mint. Amount swapped before cannot be bigger than the
             # max amount swapped including new liquidity.
-
-            # TODO: Alastair mentioned this potentially being able to be calculated in a simpler way. To discuss.
+            # NOTE: There might be a simpler way to do it but we keep it verbose to showcase the math.
 
             # Round percSwap down which means rounding substrahend down and newOneMinusPercSwapMint up.
             substrahend = (
