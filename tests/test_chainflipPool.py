@@ -9,9 +9,20 @@ from test_uniswapPool import createLedger, getAccountsFromLedger, ledger, accoun
 # NOTE: These tests are adapted from the original UniswapPool tests but changing the range orders minted
 # for limit orders. More tests have been added in order to test limit orders.
 
-# Fixtures are not resetted for every strategy, so we need to reset them manually
+
+def createPool(feeAmount, tickSpacing, ledger):
+    feeAmount = feeAmount
+    pool = ChainflipPool(TEST_TOKENS[0], TEST_TOKENS[1], feeAmount, tickSpacing, ledger)
+    minTick = getMinTickLO(tickSpacing)
+    maxTick = getMaxTickLO(tickSpacing)
+    return pool, minTick, maxTick, feeAmount, tickSpacing
+
+
+# TODO: Try putting ledger and accounts into a conftest.py file so they get reseted in strategy runs. That will need to
+# be set in the uniswap repo. Then try if it works.
+# Fixtures are not resetted for every strategy, so we reset them manually.
 def environmentRandomTesting(feesEnabled):
-    ledger = createLedger(4)
+    ledger = createLedger()
     accounts = getAccountsFromLedger(ledger)
 
     pool, minTick, maxTick, _, _ = createPool(
@@ -21,14 +32,6 @@ def environmentRandomTesting(feesEnabled):
     pool.initialize(encodePriceSqrt(1, 1))
 
     return pool, minTick, maxTick, ledger, accounts
-
-
-def createPool(feeAmount, tickSpacing, ledger):
-    feeAmount = feeAmount
-    pool = ChainflipPool(TEST_TOKENS[0], TEST_TOKENS[1], feeAmount, tickSpacing, ledger)
-    minTick = getMinTickLO(tickSpacing)
-    maxTick = getMaxTickLO(tickSpacing)
-    return pool, minTick, maxTick, feeAmount, tickSpacing
 
 
 @pytest.fixture
@@ -2245,6 +2248,10 @@ def test_enoughBalance_token0(initializedPoolSwapBalances, accounts, ledger):
     pool, _, _, _, _ = initializedPoolSwapBalances
     # Change current tick so it picks up the LO placed on pool.slot0.tick
     pool.slot0.tick = -pool.tickSpacing
+
+    # Set the balance of the account to < MAX_INT128
+    ledger.accounts[accounts[2]].balances[TEST_TOKENS[0]] = expandTo18Decimals(1)
+
     swapExact0For1(
         pool, ledger.balanceOf(accounts[2], TEST_TOKENS[0]), accounts[2], None
     )
@@ -2255,6 +2262,9 @@ def test_enoughBalance_token1(initializedPoolSwapBalances, accounts, ledger):
     print("swapper doesn't have enough token0")
     pool, _, _, _, _ = initializedPoolSwapBalances
 
+    # Set the balance of the account to < MAX_INT128
+    ledger.accounts[accounts[2]].balances[TEST_TOKENS[1]] = expandTo18Decimals(1)
+
     swapExact1For0(
         pool, ledger.balanceOf(accounts[2], TEST_TOKENS[1]), accounts[2], None
     )
@@ -2264,7 +2274,11 @@ def test_enoughBalance_token1(initializedPoolSwapBalances, accounts, ledger):
 def test_notEnoughBalance_token0(initializedPoolSwapBalances, accounts, ledger):
     print("swapper doesn't have enough token0")
     pool, _, _, _, _ = initializedPoolSwapBalances
+
+    # Set the balance of the account to < MAX_INT128
+    ledger.accounts[accounts[2]].balances[TEST_TOKENS[0]] = expandTo18Decimals(1)
     initialBalanceToken0 = ledger.balanceOf(accounts[2], TEST_TOKENS[0])
+
     # Change current tick so it picks up the LO placed on pool.slot0.tick
     pool.slot0.tick = -pool.tickSpacing
     tryExceptHandler(
@@ -2281,7 +2295,11 @@ def test_notEnoughBalance_token0(initializedPoolSwapBalances, accounts, ledger):
 def test_notEnoughBalance_token1(initializedPoolSwapBalances, accounts, ledger):
     print("swapper doesn't have enough token1")
     pool, _, _, _, _ = initializedPoolSwapBalances
+
+    # Set the balance of the account to < MAX_INT128
+    ledger.accounts[accounts[2]].balances[TEST_TOKENS[1]] = expandTo18Decimals(1)
     initialBalanceToken1 = ledger.balanceOf(accounts[2], TEST_TOKENS[1])
+
     tryExceptHandler(
         swapExact1For0,
         "Insufficient balance",
