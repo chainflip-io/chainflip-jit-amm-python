@@ -1,5 +1,5 @@
 ## JIT-AMM Python
-JIT-AMM build in python. It is build based on the pythonized Uniswap V3 AMM. (https://github.com/chainflip-io/python-uniswap-v3)
+JIT-AMM build in python. It is build based on the pythonized [Uniswap V3 AMM](https://github.com/chainflip-io/python-uniswap-v3).
 
 ## Dependencies
 
