@@ -1,6 +1,5 @@
-from Shared import *
-import TickMath
-import FullMath
+from uniswapV3Python.src.libraries.Shared import *
+from uniswapV3Python.src.libraries import FullMath, TickMath
 
 # Calculating the price at a tick.
 # NOTE: There is probably a better way to do this since getting the sqrtPrice and then squaring it

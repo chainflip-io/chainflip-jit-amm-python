@@ -1,10 +1,15 @@
-from utilities import *
 from hypothesis import given, strategies as st
 from hypothesis import settings
 import datetime
 
-from ChainflipPool import *
-from test_uniswapPool import createLedger, getAccountsFromLedger, ledger, accounts
+from uniswapV3Python.tests.utilities import *
+from uniswapV3Python.tests.test_uniswapPool import (
+    createLedger,
+    getAccountsFromLedger,
+    ledger,
+    accounts,
+)
+from ..src.ChainflipPool import *
 
 # NOTE: These tests are adapted from the original UniswapPool tests but changing the range orders minted
 # for limit orders. More tests have been added in order to test limit orders.

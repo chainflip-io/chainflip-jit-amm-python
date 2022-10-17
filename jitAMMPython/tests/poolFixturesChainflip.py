@@ -1,6 +1,6 @@
-from utilities import *
-from SharedLimitOrder import *
-import Position
+from uniswapV3Python.tests.utilities import *
+from uniswapV3Python.src.libraries import Position
+from ..src.libraries.SharedLimitOrder import *
 
 
 @dataclass

@@ -1,9 +1,9 @@
-from poolFixturesChainflip import *
-from test_chainflipPool import accounts, ledger
-from UniswapV3PoolSwaps import swapsSnapshot
+from .poolFixturesChainflip import *
+from .test_chainflipPool import accounts, ledger
+from uniswapV3Python.tests.UniswapV3PoolSwaps import swapsSnapshot
 
-from ChainflipPool import ChainflipPool
-from SharedLimitOrder import *
+from ..src.ChainflipPool import ChainflipPool
+from ..src.libraries.SharedLimitOrder import *
 
 
 @pytest.fixture(params=[*range(0, 25, 1)])

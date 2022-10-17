@@ -1,5 +1,6 @@
-from Shared import *
-import LiquidityMath, LimitOrderMath, FullMath
+from uniswapV3Python.src.libraries.Shared import *
+from uniswapV3Python.src.libraries import LiquidityMath, FullMath
+from . import LimitOrderMath
 
 
 @dataclass

@@ -1,5 +1,5 @@
 import math
-from Shared import *
+from uniswapV3Python.src.libraries.Shared import *
 
 # ------------------ Constants ------------------ #
 

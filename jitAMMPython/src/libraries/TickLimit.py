@@ -1,5 +1,5 @@
-import LiquidityMath
-from SharedLimitOrder import *
+from uniswapV3Python.src.libraries import LiquidityMath
+from .SharedLimitOrder import *
 
 
 def update(

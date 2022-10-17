@@ -1,7 +1,13 @@
-from UniswapPool import *
-import TickLimit, LimitOrderTickMath, PositionLimit, LimitOrderMath, LimitOrderSwapMath
+from uniswapV3Python.src.UniswapPool import *
+from .libraries.SharedLimitOrder import *
 
-from SharedLimitOrder import *
+from .libraries import (
+    TickLimit,
+    LimitOrderTickMath,
+    PositionLimit,
+    LimitOrderMath,
+    LimitOrderSwapMath,
+)
 
 from dataclasses import dataclass
 

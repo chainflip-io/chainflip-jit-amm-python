@@ -1,10 +1,9 @@
-from utilities import *
+from uniswapV3Python.tests.utilities import *
+from uniswapV3Python.src import UniswapPool
+from uniswapV3Python.src.libraries.Account import Ledger
+from uniswapV3Python.src.libraries import SwapMath, TickMath
 
-from UniswapPool import *
-from ChainflipPool import *
-from Account import Ledger
-
-import SwapMath, TickMath
+from ..src.ChainflipPool import *
 
 import copy
 

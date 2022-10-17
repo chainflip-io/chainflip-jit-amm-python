@@ -1,5 +1,7 @@
-import LimitOrderMath, FullMath, math
-from Shared import *
+import math
+from . import LimitOrderMath
+from uniswapV3Python.src.libraries import FullMath
+from uniswapV3Python.src.libraries.Shared import *
 
 
 def computeSwapStep(

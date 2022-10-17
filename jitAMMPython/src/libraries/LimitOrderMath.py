@@ -1,7 +1,9 @@
-import math, FullMath
+import math
+
+from uniswapV3Python.src.libraries import FullMath
+from uniswapV3Python.src.libraries.Shared import *
 
 from decimal import *
-from Shared import *
 
 
 def calculateAmount1LO(amountInToken0, priceX96, roundUp):
