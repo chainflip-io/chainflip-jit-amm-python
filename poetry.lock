@@ -231,19 +231,6 @@ optional = false
 python-versions = ">=3.7"
 
 [[package]]
-name = "trialpythonuniswapv3"
-version = "0.0.2"
-description = "Pythonized Uniswap V3"
-category = "main"
-optional = false
-python-versions = ">=3.6"
-
-[package.source]
-type = "legacy"
-url = "https://test.pypi.org/simple"
-reference = "trialpythonuniswapv3"
-
-[[package]]
 name = "typed-ast"
 version = "1.5.4"
 description = "a fork of Python 2 and 3 ast modules with type comment support"
@@ -260,6 +247,19 @@ optional = false
 python-versions = ">=3.7"
 
 [[package]]
+name = "uniswapv3python"
+version = "0.0.1"
+description = "Pythonized Uniswap V3"
+category = "main"
+optional = false
+python-versions = ">=3.7"
+
+[package.source]
+type = "legacy"
+url = "https://test.pypi.org/simple"
+reference = "uniswapV3Python"
+
+[[package]]
 name = "zipp"
 version = "3.9.0"
 description = "Backport of pathlib-compatible object wrapper for zip files"
@@ -274,7 +274,7 @@ testing = ["pytest (>=6)", "pytest-checkdocs (>=2.4)", "pytest-flake8", "flake8 
 [metadata]
 lock-version = "1.1"
 python-versions = ">=3.7.3, <3.10"
-content-hash = "c053193de24c51d5da5ccb8469d14cb98ae42be5c3c710a483c8bccf9d7e2d4a"
+content-hash = "6084bc6ba6f2dd1542e5d054111191e8afd4a5420598af0dd0219ccfb7de3168"
 
 [metadata.files]
 attrs = []
@@ -295,10 +295,10 @@ pyparsing = []
 pytest = []
 sortedcontainers = []
 tomli = []
-trialpythonuniswapv3 = [
-    {file = "trialpythonuniswapv3-0.0.2-py3-none-any.whl", hash = "sha256:4370967b47dc2368be3793540fc2b954dd3df7d2a1f3327aa3276b29fc32a77f"},
-    {file = "trialpythonuniswapv3-0.0.2.tar.gz", hash = "sha256:0b185e49b6d7d44d1f797dbd05a0a2fd36b363e2e08b9d30b49225a027863203"},
-]
 typed-ast = []
 typing-extensions = []
+uniswapv3python = [
+    {file = "uniswapV3Python-0.0.1-py3-none-any.whl", hash = "sha256:38b65db5c30e46d5db0f057a00f9a6f28e42941e2f67061cf294449e5bf3f8e0"},
+    {file = "uniswapV3Python-0.0.1.tar.gz", hash = "sha256:71bce9c62ea855c4b3481dc01304e3aaafa0f0f9b3b650f5a1db4de206f9c2bd"},
+]
 zipp = []
