@@ -51,21 +51,9 @@ def createLedger(numAccounts):
     ledger = Ledger(accounts[0:numAccounts])
     return ledger
 
-
-@pytest.fixture(params=[*range(0, 2, 1)])
-def TEST_POOLS(request):
-    return request.getfixturevalue("pools{}".format(request.param))
-
-
 @pytest.fixture
-def pools0():
-    return UniswapPool
-
-
-@pytest.fixture
-def pools1():
+def TEST_POOLS():
     return ChainflipPool
-
 
 def createPool(TEST_POOLS, feeAmount, tickSpacing, ledger):
     feeAmount = feeAmount
