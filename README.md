@@ -1,5 +1,9 @@
 ## JIT-AMM Python
-JIT-AMM build in python. It is build based on the pythonized [Uniswap V3 AMM](https://github.com/chainflip-io/python-uniswap-v3).
+This repository contains a python model of the Chainflip JIT AMM. It is build based on the [Pythonized Uniswap V3](https://github.com/chainflip-io/python-uniswap-v3) AMM.
+
+This logic aims to provide an initial model for the Chainflip JIT AMM that will be implemented in the State Chain of the Chainflip protocol. It inherits the range order logic from the Uniswap V3 AMM and adds an additional type of orders - limit lrders. 
+
+Limit orders allow liquidity providers to place single-sided positions on any tick (not range). These orders will be executed at the tick price and will be used iff they provide a better swap price for the user than the range orders. Once the positions are consumed, the swapped position plus the accumulated fees will be collected automatically and transferred to the liquidity provider's balance. All the limit order positions are bundled into ticks following the same approach as the range orders.
 
 ## Dependencies
 
@@ -21,7 +25,7 @@ poetry install
 
 ### Running Tests
 
-We use pytest to run the tests.
+Pytest is used to run the tests.
 
 ```bash
 pytest

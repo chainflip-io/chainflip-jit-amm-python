@@ -15,6 +15,7 @@ import copy
 
 # NOTE: These tests are the same tests as for the uniswapPool - testing range orders.
 
+
 @pytest.fixture
 def TEST_POOLS():
     return ChainflipPool
