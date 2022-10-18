@@ -1,5 +1,5 @@
 ## Chainflip JIT AMM - Python model
-This repository contains a python model of the Chainflip JIT AMM. It is build based on the [Pythonized Uniswap V3](https://github.com/chainflip-io/uniswap-v3-python) AMM.
+This repository contains a python model of the Chainflip JIT AMM. It is build based on the [Pythonized Uniswap V3](https://github.com/chainflip-io/chainflip-uniswapV3-python) AMM.
 
 This logic aims to provide an initial model for the Chainflip JIT AMM that will be implemented in the Chainflip protocol. It inherits the range order logic from the Uniswap V3 AMM and adds an additional type of orders - limit lrders. 
 
