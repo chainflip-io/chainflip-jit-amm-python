@@ -2,58 +2,23 @@ from uniswapV3Python.tests.utilities import *
 from uniswapV3Python.src import UniswapPool
 from uniswapV3Python.src.libraries.Account import Ledger
 from uniswapV3Python.src.libraries import SwapMath, TickMath
+from uniswapV3Python.tests.test_uniswapPool import (
+    createLedger,
+    getAccountsFromLedger,
+    ledger,
+    accounts,
+)
 
 from ..src.ChainflipPool import *
 
 import copy
 
-
-@pytest.fixture
-def accounts(ledger):
-    return getAccountsFromLedger(ledger)
-
-
-def getAccountsFromLedger(l):
-    # list of raw addresses
-    return list(l.accounts.keys())
-
-
-@pytest.fixture
-def ledger():
-    return createLedger(6)
-
-
-def createLedger(numAccounts):
-    # Fund them with infinite tokens
-    account0 = [
-        "ALICE",
-        TEST_TOKENS,
-        [MAX_INT256 // 100, MAX_INT256 // 100 // 100],
-    ]
-    account1 = ["BOB", TEST_TOKENS, [MAX_INT256 // 100, MAX_INT256 // 100]]
-    account2 = ["CHARLIE", TEST_TOKENS, [1000, 2000]]
-    account3 = [
-        "DENICE",
-        TEST_TOKENS,
-        [expandTo18Decimals(10), expandTo18Decimals(10)],
-    ]
-    account4 = [
-        "EVA",
-        TEST_TOKENS,
-        [MAX_INT256 // 100, MAX_INT256 // 100],
-    ]
-    account5 = [
-        "FINN",
-        TEST_TOKENS,
-        [MAX_INT256 // 100, MAX_INT256 // 100],
-    ]
-    accounts = [account0, account1, account2, account3, account4, account5]
-    ledger = Ledger(accounts[0:numAccounts])
-    return ledger
+# NOTE: These tests are the same tests as for the uniswapPool - testing range orders.
 
 @pytest.fixture
 def TEST_POOLS():
     return ChainflipPool
+
 
 def createPool(TEST_POOLS, feeAmount, tickSpacing, ledger):
     feeAmount = feeAmount
@@ -1559,6 +1524,9 @@ def test_enoughBalance_token0(initializedPoolSwapBalances, accounts, ledger):
     print("swapper swaps all token0")
     pool, _, _, _, _ = initializedPoolSwapBalances
 
+    # Set the balance of the account to < MAX_INT128
+    ledger.accounts[accounts[2]].balances[TEST_TOKENS[0]] = expandTo18Decimals(1)
+
     swapExact0For1(
         pool, ledger.balanceOf(accounts[2], TEST_TOKENS[0]), accounts[2], None
     )
@@ -1569,6 +1537,9 @@ def test_enoughBalance_token1(initializedPoolSwapBalances, accounts, ledger):
     print("swapper doesn't have enough token0")
     pool, _, _, _, _ = initializedPoolSwapBalances
 
+    # Set the balance of the account to < MAX_INT128
+    ledger.accounts[accounts[2]].balances[TEST_TOKENS[1]] = expandTo18Decimals(1)
+
     swapExact1For0(
         pool, ledger.balanceOf(accounts[2], TEST_TOKENS[1]), accounts[2], None
     )
@@ -1578,7 +1549,11 @@ def test_enoughBalance_token1(initializedPoolSwapBalances, accounts, ledger):
 def test_notEnoughBalance_token0(initializedPoolSwapBalances, accounts, ledger):
     print("swapper doesn't have enough token0")
     pool, _, _, _, _ = initializedPoolSwapBalances
+
+    # Set the balance of the account to < MAX_INT128
+    ledger.accounts[accounts[2]].balances[TEST_TOKENS[0]] = expandTo18Decimals(1)
     initialBalanceToken0 = ledger.balanceOf(accounts[2], TEST_TOKENS[0])
+
     tryExceptHandler(
         swapExact0For1,
         "Insufficient balance",
@@ -1593,7 +1568,11 @@ def test_notEnoughBalance_token0(initializedPoolSwapBalances, accounts, ledger):
 def test_notEnoughBalance_token1(initializedPoolSwapBalances, accounts, ledger):
     print("swapper doesn't have enough token1")
     pool, _, _, _, _ = initializedPoolSwapBalances
+
+    # Set the balance of the account to < MAX_INT128
+    ledger.accounts[accounts[2]].balances[TEST_TOKENS[1]] = expandTo18Decimals(1)
     initialBalanceToken1 = ledger.balanceOf(accounts[2], TEST_TOKENS[1])
+
     tryExceptHandler(
         swapExact1For0,
         "Insufficient balance",

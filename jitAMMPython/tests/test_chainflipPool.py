@@ -23,10 +23,8 @@ def createPool(feeAmount, tickSpacing, ledger):
     return pool, minTick, maxTick, feeAmount, tickSpacing
 
 
-# TODO: Try putting ledger and accounts into a conftest.py file so they get reseted in strategy runs. That will need to
-# be set in the uniswap repo. Then try if it works.
 # Fixtures are not resetted for every strategy, so we reset them manually.
-def environmentRandomTesting(feesEnabled):
+def poolRandomTests(feesEnabled):
     ledger = createLedger()
     accounts = getAccountsFromLedger(ledger)
 
@@ -3779,7 +3777,7 @@ def test_precision_zeroForOne(st_swapAmountsPerc, st_mintAmount, numberOfSwaps):
     print("Check precision in tick.oneMinusPercSwap")
 
     # Initialize without fees tp make the math and the checking easier
-    pool, _, _, _, accounts = environmentRandomTesting(False)
+    pool, _, _, _, accounts = poolRandomTests(False)
 
     # Adding some initial liquidity because in some edge cases there is 1 in favour of user because there are no
     # fees. Will look into it later.
@@ -3870,7 +3868,7 @@ def test_precision_oneForZero(st_swapAmountsPerc, st_mintAmount, numberOfSwaps):
     print("Check precision in tick.oneMinusPercSwap")
 
     # Initialize without fees tp make the math and the checking easier
-    pool, minTick, maxTick, ledger, accounts = environmentRandomTesting(False)
+    pool, minTick, maxTick, ledger, accounts = poolRandomTests(False)
 
     # Setting a non-exact value to get non-exact numbers
     amountToMint = st_mintAmount
@@ -4030,7 +4028,7 @@ def test_randomLO_onRO_zeroForOne(st_isToken0, st_swapAmounts, st_tick, st_mintA
         "Trying random LO position on top of RO and random swaps in the zeroForOne direction"
     )
 
-    pool, minTick, maxTick, ledger, accounts = environmentRandomTesting(True)
+    pool, minTick, maxTick, ledger, accounts = poolRandomTests(True)
 
     # Add some RO Liquidity as a base
     pool.mint(accounts[0], minTick, maxTick, expandTo18Decimals(100))
@@ -4189,7 +4187,7 @@ def test_randomLO_onRO_oneForZero(st_isToken0, st_swapAmounts, st_tick, st_mintA
         "Trying random LO position on top of RO and random swaps in the OneForZero direction"
     )
 
-    pool, minTick, maxTick, ledger, accounts = environmentRandomTesting(True)
+    pool, minTick, maxTick, ledger, accounts = poolRandomTests(True)
 
     # Add some RO Liquidity as a base
     pool.mint(accounts[0], minTick, maxTick, expandTo18Decimals(100))
