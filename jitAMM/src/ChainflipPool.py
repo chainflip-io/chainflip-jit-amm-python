@@ -80,7 +80,6 @@ class ChainflipPool(UniswapPool):
 
         return amountIn
 
-    # Internal function not to be called externally
     def _modifyPositionLimitOrder(self, token, params):
         checkInputTypes(
             string=token,
@@ -104,7 +103,6 @@ class ChainflipPool(UniswapPool):
 
         return position, liquidityLeftDelta, liquiditySwappedDelta
 
-    # Internal function not to be called externally
     def _updatePositionLimitOrder(self, token, owner, tick, liquidityDelta):
         checkInputTypes(
             string=token,

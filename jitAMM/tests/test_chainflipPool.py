@@ -658,14 +658,8 @@ def test_removing_belowCurrentPrice(initializedMediumPool, accounts):
     assert amount1 == 0
 
 
-# -------------------------------------- Notes about fees --------------------------------------
-# For protocol fees it doesn't matter the position's liquidity since it only depends on amountIn.
-# For growth fees, it is linear depending on the liquidity. However, feeGrowthInsideX128 is per
-# unit of liquidity so it will depend on the positions liquidity. However, when collecting, the
-# final amount should be the same (feeGrowthInsideX128 * positionLiquid).
-# Also, position with TEST_TOKENS[0] will accrue growth fees in token1 (swaps oneForZero) while
-# TEST_TOKENS[1] will accrue fees in token0 (swaps zeroForOne).
-# ----------------------------------------------------------------------------------------------
+# Fees - Position with liquidity in token0 will accrue growth fees in token1 (swaps oneForZero) while
+# token1 will accrue fees in token0 (swaps zeroForOne).
 
 
 def test_fees_duringSwap(initializedMediumPool, accounts):
