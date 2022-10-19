@@ -248,7 +248,7 @@ python-versions = ">=3.7"
 
 [[package]]
 name = "uniswapv3python"
-version = "0.0.1"
+version = "0.0.2"
 description = "Pythonized Uniswap V3"
 category = "main"
 optional = false
@@ -274,7 +274,7 @@ testing = ["pytest (>=6)", "pytest-checkdocs (>=2.4)", "pytest-flake8", "flake8 
 [metadata]
 lock-version = "1.1"
 python-versions = ">=3.7.3, <3.10"
-content-hash = "6084bc6ba6f2dd1542e5d054111191e8afd4a5420598af0dd0219ccfb7de3168"
+content-hash = "754f39febdb323781ba9a46f8d7c139d8190b9a1036b6be3a9bc1eeec5c61459"
 
 [metadata.files]
 attrs = []
@@ -298,7 +298,7 @@ tomli = []
 typed-ast = []
 typing-extensions = []
 uniswapv3python = [
-    {file = "uniswapV3Python-0.0.1-py3-none-any.whl", hash = "sha256:38b65db5c30e46d5db0f057a00f9a6f28e42941e2f67061cf294449e5bf3f8e0"},
-    {file = "uniswapV3Python-0.0.1.tar.gz", hash = "sha256:71bce9c62ea855c4b3481dc01304e3aaafa0f0f9b3b650f5a1db4de206f9c2bd"},
+    {file = "uniswapV3Python-0.0.2-py3-none-any.whl", hash = "sha256:55008087c470d86e68fa4294be0d7beb109752ae42e3e0f715a07d9e1b7646fb"},
+    {file = "uniswapV3Python-0.0.2.tar.gz", hash = "sha256:5a50296246c17ed4588ef4ebf83db8ac2fd04603f7bb032a0b6699827849de09"},
 ]
 zipp = []
