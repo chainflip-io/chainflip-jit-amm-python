@@ -5,28 +5,35 @@ from uniswapV3Python.src.libraries.Shared import *
 
 from decimal import *
 
-
+### @notice Calculates the amount1 from an amountInToken0 and a tick priceX96
+### @dev Calculates amountInToken0 * price
+### @param amountInToken0 Amount In in token 0
+### @param priceX96 Price at the limit order tick
+### @param roundUp Bool to signal if it needs to be rounded up or down
+### @return amount1 Amount of token1 obtained by swapping amountInToken0
 def calculateAmount1LO(amountInToken0, priceX96, roundUp):
     checkInputTypes(uint256=(priceX96), int256=amountInToken0)
+
+    # NOTE: Not using FullMath mulDiv and mulDivRoundingUp because of the potential overflow, mainly when rounding down
+    # called by LimitcomputeSwapStep. We let it overflow and cap it afterwards. If done in other languages (Pyth/Rust)
+    # we need to accomodate for that or do it in a slightly different way (e.g. mulDiv handling larger uint)
     if roundUp:
-        return FullMath.mulDivRoundingUp(amountInToken0, priceX96, FixedPoint96_Q96)
+        return unsafeMulDivRoundingUp(amountInToken0, priceX96, FixedPoint96_Q96)
     else:
-        # NOTE: Not using MulDiv because of the potential overflow when called by LimitcomputeSwapStep. We let
-        # it overflow and cap it afterwards. If done in other languages (Pyth/Rust) we need to
-        # accomodate for that or do it in a slightly different way (e.g. mulDiv handling larger uint)
-        return (amountInToken0 * priceX96) // FixedPoint96_Q96
+        return unsafeMulDiv(amountInToken0, priceX96, FixedPoint96_Q96)
 
 
 def calculateAmount0LO(amountInToken1, priceX96, roundUp):
     checkInputTypes(uint256=(priceX96), int256=amountInToken1)
+
+    # NOTE: Not using FullMath mulDiv and mulDivRoundingUp because of the potential overflow, mainly when rounding down
+    # called by LimitcomputeSwapStep. We let it overflow and cap it afterwards. If done in other languages (Pyth/Rust)
+    # we need to accomodate for that or do it in a slightly different way (e.g. mulDiv handling larger uint)
     if roundUp:
         # Should never be divided by zero because it is not allowed to mint positions at price 0.
-        return FullMath.mulDivRoundingUp(amountInToken1, FixedPoint96_Q96, priceX96)
+        return unsafeMulDivRoundingUp(amountInToken1, FixedPoint96_Q96, priceX96)
     else:
-        # NOTE: Not using MulDiv because of the potential overflow when called by LimitcomputeSwapStep. We let
-        # it overflow and cap it afterwards. If done in other languages (Pyth/Rust) we need to
-        # accomodate for that or do it in a slightly different way (e.g. mulDiv handling larger uint)
-        return (amountInToken1 * FixedPoint96_Q96) // priceX96
+        return unsafeMulDiv(amountInToken1, FixedPoint96_Q96, priceX96)
 
 
 def getAmountSwappedFromTickPercentatge(
@@ -75,4 +82,34 @@ def subtractDecimalRoundingUp(a, b):
     # Assert overflow
     assert result >= Decimal("0")
     setDecimalPrecRound(getcontext().prec, "ROUND_DOWN")
+    return result
+
+
+## @notice Calculates ceil(a×b÷denominator) with full precision.
+## @param a The multiplicand
+## @param b The multiplier
+## @param denominator The divisor
+## @return result The 256-bit result
+def unsafeMulDivRoundingUp(a, b, c):
+    return unsafeDivRoundingUp(a * b, c)
+
+
+## @notice Calculates ceil(a÷denominator) with full precision rounding up.
+## @param a The multiplicand
+## @param b The divisor
+## @return result The 256-bit result
+def unsafeDivRoundingUp(a, b):
+    result = a // b
+    if a % b > 0:
+        result += 1
+    return result
+
+
+## @notice Calculates floor(a×b÷denominator) with full precision.
+## @param a The multiplicand
+## @param b The multiplier
+## @param denominator The divisor
+## @return result The 256-bit result
+def unsafeMulDiv(a, b, c):
+    result = (a * b) // c
     return result

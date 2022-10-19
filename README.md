@@ -29,5 +29,5 @@ Pytest is used to run the tests.
 
 ```bash
 pytest
-pytest <test-name>
+pytest <testfile-name>::<test-name>
 ```

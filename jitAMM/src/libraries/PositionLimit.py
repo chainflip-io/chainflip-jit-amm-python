@@ -8,7 +8,7 @@ class PositionLimitInfo:
     ## the amount of liquidity owned by this position in the token provided
     liquidity: int
     ## percentatge swapped in the pool when the position was minted. Relative meaning.
-    # Storing 1 minus the value.
+    # Storing 1 minus the value to achieve higher accuracy when it tends to zero.
     # Possibly using floating point number with 256 in both the mantissa and the exponent.
     # For now, in python using Decimal to get more precision than a simple float and to be able
     # to achieve better rounding. Initial value should be one.

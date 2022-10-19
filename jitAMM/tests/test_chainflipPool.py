@@ -10,6 +10,7 @@ from uniswapV3Python.tests.test_uniswapPool import (
     accounts,
 )
 from ..src.ChainflipPool import *
+from ..src.libraries import LimitOrderSwapMath
 
 # NOTE: These tests are adapted from the original UniswapPool tests but changing the range orders minted
 # for limit orders. More tests have been added in order to test limit orders.
@@ -4066,7 +4067,7 @@ def test_randomLO_onRO_zeroForOne(st_isToken0, st_swapAmounts, st_tick, st_mintA
             limitOrderUsed = False
 
         # Get if LO tick should be crossed
-        (_, _, _, tickCrossed, _) = SwapMath.computeLimitSwapStep(
+        (_, _, _, tickCrossed, _) = LimitOrderSwapMath.computeSwapStep(
             LOPrice,
             st_mintAmount,
             sum(st_swapAmounts),
@@ -4224,7 +4225,7 @@ def test_randomLO_onRO_oneForZero(st_isToken0, st_swapAmounts, st_tick, st_mintA
             limitOrderUsed = False
 
         # Get if LO tick should be crossed
-        (_, _, _, tickCrossed, percSwapDecrease) = SwapMath.computeLimitSwapStep(
+        (_, _, _, tickCrossed, percSwapDecrease) = LimitOrderSwapMath.computeSwapStep(
             LOPrice,
             st_mintAmount,
             sum(st_swapAmounts),
