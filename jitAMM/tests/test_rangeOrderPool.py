@@ -13,7 +13,8 @@ from ..src.ChainflipPool import *
 
 import copy
 
-# NOTE: These tests are the same tests as for the uniswapPool - testing range orders.
+# NOTE: These tests are the same tests as for the uniswapPool - testing range orders and ensuring that
+# the normal behaviour of the range orders underneath the Limit Orders is still correct.
 
 
 @pytest.fixture

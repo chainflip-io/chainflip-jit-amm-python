@@ -2,7 +2,9 @@ from uniswapV3Python.src.libraries.Shared import *
 from uniswapV3Python.src.libraries import LiquidityMath, FullMath
 from . import LimitOrderMath
 
-
+### @title PositionLimit
+### @notice Positions represent an owner address' liquidity at a certain tick.
+### @dev Positions store additional state for tracking fees owed to the position.
 @dataclass
 class PositionLimitInfo:
     ## the amount of liquidity owned by this position in the token provided
@@ -14,7 +16,7 @@ class PositionLimitInfo:
     # to achieve better rounding. Initial value should be one.
     oneMinusPercSwapMint: Decimal
     ## the position owed to the position owner in token0#token1 => uint128
-    # Since we can burn a position half swapped, we need both tokensOwed0 and tokensOwed1
+    # TokensOwed will contain liquidity tokens swapped/burnt plus fees to be collected
     tokensOwed0: int
     tokensOwed1: int
     ## fee growth per unit of liquidity as of the last update to liquidity or fees owed.
@@ -22,6 +24,13 @@ class PositionLimitInfo:
     feeGrowthInsideLastX128: int
 
 
+### @notice Returns the PositionLimitInfo struct of a position, given an owner, tick
+### and a token indicator.
+### @param self The mapping containing all user positions
+### @param owner The address of the position owner
+### @param tick The tick of the position
+### @param isToken0 Whether the position's liquidity is in token0 or token1
+### @return position The position info struct of the given owners' position
 def get(self, owner, tick, isToken0):
     checkInputTypes(account=owner, int24=tick, bool=isToken0)
 
@@ -37,7 +46,19 @@ def get(self, owner, tick, isToken0):
     return self[key], created
 
 
-# This updates the tokensOwed (current position ratio), the position.liquidity and the fees
+### @notice Credits accumulated fees to a user's position. Additionally, if a mint call is being done on the
+### same position, the oneMinusPercSwap is updated. If a burn call is taking place, the liquidity is updated
+### together with the position's tokens owed.
+### @dev If we have just created a position, we need to initialize the oneMinusPercSwapMint and feegrowthInsideLastX128.
+### @param self The individual position to update
+### @param liquidityDelta The change in pool liquidity as a result of the position update
+### @param oneMinusPercSwap The tick swap percentatge status
+### @param isToken0 Whether the position's liquidity is in token0 or token1
+### @param priceX96 The price at the position's tick
+### @param created Whether the position has just been created
+### @param feeGrowthInsideX128 The all-time fee growth in !isToken0.
+### @return liquidityLeftDelta Change in liquidity's position left to be swapped in isToken0 token.
+### @return liquiditySwappedDelta Change in liquidity's position already swapped in !isToken0 token.
 def update(
     self,
     liquidityDelta,
@@ -54,8 +75,7 @@ def update(
         bool=(isToken0, created),
     )
 
-    # If we have just created a position, we need to initialize the amountSwappedInsideLastX128.
-    # We could probably do this somewhere else.
+    # If we have just created a position initialize the oneMinusPercSwapMint and feegrowthInsideLastX128.
     if created:
         assert liquidityDelta > 0  # health check
         self.oneMinusPercSwapMint = oneMinusPercSwap
@@ -254,5 +274,5 @@ def update(
         else:
             self.tokensOwed0 += tokensOwed
 
-    # Returning liquiditySwappedDelta to return as a result of the burn function
+    # Returning liquidityLeftDelta amd liquiditySwappedDelta to return as a result of the burn function
     return liquidityLeftDelta, liquiditySwappedDelta

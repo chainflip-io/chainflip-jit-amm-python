@@ -4,6 +4,22 @@ from uniswapV3Python.src.libraries import FullMath
 from uniswapV3Python.src.libraries.Shared import *
 
 
+### @title Computes the result of a swap in a given tick.
+### @notice Contains methods for computing the result of a swap in a single tick price.
+
+### @notice Computes the result of swapping some amount in, or amount out, given the parameters of the swap
+### @dev The fee, plus the amount in, will never exceed the amount remaining if the swap's `amountSpecified` is positive
+### @param priceX96 The price at the given tick
+### @param liquidityGross The usable tick liquidity
+### @param amountRemaining How much input or output amount is remaining to be swapped in#out
+### @param feePips The fee taken from the input amount, expressed in hundredths of a bip
+### @param zeroForOne The swap direction
+### @param oneMinusPercSwap The tick swap percentatge status
+### @return amountIn The amount to be swapped in, of either token0 or token1, based on the direction of the swap
+### @return amountOut The amount to be received, of either token0 or token1, based on the direction of the swap
+### @return feeAmount The amount of input that will be taken as a fee
+### @return tickCrossed A bool signaling that the tick was crossed
+### @return resultingOneMinusPercSwap The final swap percentatge status of the swapped tick
 def computeSwapStep(
     priceX96, liquidityGross, amountRemaining, feePips, zeroForOne, oneMinusPercSwap
 ):
@@ -96,6 +112,16 @@ def computeSwapStep(
     return (amountIn, amountOut, feeAmount, tickCrossed, resultingOneMinusPercSwap)
 
 
+### @notice Computes the exact amountIn, amountOut and resultingOneMinusPercSwap. This is called when the
+### swap happens within a tick (not crossing tick) and the exact amountIn and amountOut need to be computed.
+### @param amountOut The amount to be received either calculated (exactIn) or specified (exactOut).
+### @param priceX96 The price at the given tick
+### @param liquidity The usable tick liquidity
+### @param oneMinusPercSwap The tick swap percentatge status
+### @param zeroForOne The swap direction
+### @return amountOut The exact amount out resulting from the swap.
+### @return amountOut The exact amount in resulting from the swap.
+### @return resultingOneMinusPercSwap The final swap percentatge status of the swapped tick
 def calculateAmounts(amountOut, liquidity, oneMinusPercSwap, priceX96, zeroForOne):
     checkInputTypes(
         uint256=priceX96,

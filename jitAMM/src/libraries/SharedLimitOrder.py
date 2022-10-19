@@ -9,10 +9,12 @@ MIN_TICK_LO = -665455
 ### The maximum tick that may be passed to #getPriceAtTick - symetric to MIN_TICK_LO
 MAX_TICK_LO = -MIN_TICK_LO
 
+## Mimicking a float point number with a 256 bit mantissa (== 10E77)
+contextPrecision = 77
 
 # ------------------ Shared dataclasses ------------------ #
 
-
+## info stored for each initialized individual tick
 @dataclass
 class TickInfoLimit:
     ## the total position liquidity that references this tick

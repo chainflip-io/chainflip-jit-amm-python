@@ -1,7 +1,14 @@
 from uniswapV3Python.src.libraries import LiquidityMath
 from .SharedLimitOrder import *
 
-
+### @notice Updates a limit order tick and returns true if the tick was flipped from initialized to uninitialized, or vice versa
+### @param self The mapping containing all tick information for initialized ticks
+### @param tick The tick that will be updated
+### @param liquidityDelta A new amount of liquidity to be added (subtracted)
+### @param maxLiquidity The maximum liquidity allocation for a single tick
+### @param created Whether the position modifying this tick has just been created
+### @param owner Account that modified a position contained in this tick
+### @return flipped Whether the tick was flipped from initialized to uninitialized, or vice versa
 def update(
     self,
     tick,
@@ -48,7 +55,7 @@ def update(
     else:
         # If we are burning or the position had already been initialized, the position should
         # already be in the info.ownerPositions list.
-        # Health check for development purposes
+        # Health check only for development purposes.
         assert owner in info.ownerPositions, "Position not in ownerPositions"
 
     # No longer require flip to signal if it has been initialized but it is needed for when it is cleared

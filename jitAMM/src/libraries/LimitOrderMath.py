@@ -6,7 +6,7 @@ from uniswapV3Python.src.libraries.Shared import *
 from decimal import *
 
 ### @notice Calculates the amount1 from an amountInToken0 and a tick priceX96
-### @dev Calculates amountInToken0 * price
+### @dev Calculates amountInToken0 * priceToken1PerToken0
 ### @param amountInToken0 Amount In in token 0
 ### @param priceX96 Price at the limit order tick
 ### @param roundUp Bool to signal if it needs to be rounded up or down
@@ -23,6 +23,12 @@ def calculateAmount1LO(amountInToken0, priceX96, roundUp):
         return unsafeMulDiv(amountInToken0, priceX96, FixedPoint96_Q96)
 
 
+### @notice Calculates the amount0 from an amountInToken1 and a tick priceX96
+### @dev Calculates amountInToken0 * priceToken0PerToken1
+### @param amountInToken0 Amount In in token 0
+### @param priceX96 Price at the limit order tick
+### @param roundUp Bool to signal if it needs to be rounded up or down
+### @return amount0 Amount of token0 obtained by swapping amountInToken0
 def calculateAmount0LO(amountInToken1, priceX96, roundUp):
     checkInputTypes(uint256=(priceX96), int256=amountInToken1)
 
@@ -36,6 +42,11 @@ def calculateAmount0LO(amountInToken1, priceX96, roundUp):
         return unsafeMulDiv(amountInToken1, FixedPoint96_Q96, priceX96)
 
 
+### @notice Calculates the token amount swapped between the initial state (oneMinusPercSwap) and the percSwapped
+### decrease (percSwapChange). This function rounds down while the next one rounds up.
+### @param percSwapChange Percentatge swap decrease
+### @param oneMinusPercSwap Initial state of the percentatge swap
+### @param liquidityGross Liquidity of the position
 def getAmountSwappedFromTickPercentatge(
     percSwapChange, oneMinusPercSwap, liquidityGross
 ):
@@ -61,6 +72,9 @@ def getAmountSwappedFromTickPercentatgeRoundUp(
     return amountSwappedPrev
 
 
+### @notice Set the decimal precision and other context parameters for the Decimal calculations.
+### @param precision Context precision
+### @param rounding Context rounding
 def setDecimalPrecRound(precision, rounding):
     checkInputTypes(int=(precision))
     assert rounding in ["ROUND_DOWN", "ROUND_UP"]
@@ -74,7 +88,8 @@ def setDecimalPrecRound(precision, rounding):
     setcontext(DefaultContext)
 
 
-# Used only to substract percSwapDecrease from OneMinusPercSwapped. The result should never be negative.
+### @notice Substract two decimal numbers rounding up.
+### @dev Used only to substract percSwapDecrease from OneMinusPercSwapped. The result should never be negative.
 def subtractDecimalRoundingUp(a, b):
     checkInputTypes(decimal=(a, b))
     setDecimalPrecRound(getcontext().prec, "ROUND_UP")

@@ -1,10 +1,12 @@
 from uniswapV3Python.src.libraries.Shared import *
 from uniswapV3Python.src.libraries import FullMath, TickMath
 
-# Calculating the price at a tick.
-# NOTE: There is probably a better way to do this since getting the sqrtPrice and then squaring it
-# won't give full precision. Something similar to what is done in TickMath is better but we don't
-# care too much about it for this mode.
+### @notice Computes the price at a tick.
+### @dev There are better ways to do this since getting the sqrtPrice and then squaring it
+### won't give full precision and is computationally expensive. For example something similar
+### to what is done in TickMath is better but it's irrelevant for this model.
+### @param tick The current tick
+### @return tick The price at the tick
 def getPriceAtTick(tick):
     checkInt24(tick)
     sqrtPriceX96 = TickMath.getSqrtRatioAtTick(tick)

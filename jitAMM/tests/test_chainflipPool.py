@@ -1181,72 +1181,7 @@ def test_supplyInRange(mediumPoolInitializedAtZero, accounts):
     )
 
 
-# These tests don't make sense for LO
-
-# def test_excludeSupply_tickAboveCurrentTick(mediumPoolInitializedAtZero, accounts):
-#     print("excludes supply at tick above current tick")
-#     pool, _, _, _, tickSpacing = mediumPoolInitializedAtZero
-#     pool.mintLimitOrder(TEST_TOKENS[0],accounts[0], tickSpacing, tickSpacing * 2, expandTo18Decimals(3))
-#     assert pool.liquidity == expandTo18Decimals(2)
-
-
-# def test_excludeSupply_tickBelowCurrentTick(mediumPoolInitializedAtZero, accounts):
-#     print("excludes supply at tick below current tick")
-#     pool, _, _, _, tickSpacing = mediumPoolInitializedAtZero
-#     pool.mintLimitOrder(TEST_TOKENS[0],accounts[0], -tickSpacing * 2, -tickSpacing, expandTo18Decimals(3))
-#     assert pool.liquidity == expandTo18Decimals(2)
-
-
-# def test_updatesWhenExitingRange(mediumPoolInitializedAtZero, accounts):
-#     print("updates correctly when exiting range")
-#     pool, _, _, _, tickSpacing = mediumPoolInitializedAtZero
-
-#     kBefore = pool.liquidity
-#     assert kBefore == expandTo18Decimals(2)
-
-#     ## add liquidity at and above current tick
-#     liquidityDelta = expandTo18Decimals(1)
-#     lowerTick = 0
-#     upperTick = tickSpacing
-#     pool.mintLimitOrder(TEST_TOKENS[0],accounts[0], lowerTick, upperTick, liquidityDelta)
-
-#     ## ensure virtual supply has increased appropriately
-#     kAfter = pool.liquidity
-#     assert kAfter == expandTo18Decimals(3)
-
-#     ## swap toward the left (just enough for the tick transition function to trigger)
-#     swapExact0For1(pool, 1, accounts[0], None)
-#     assert pool.slot0.tick == -1
-
-#     kAfterSwap = pool.liquidity
-#     assert kAfterSwap == expandTo18Decimals(2)
-
-
-# def test_updatesWhenEnteringRange(mediumPoolInitializedAtZero, accounts):
-#     print("updates correctly when entering range")
-#     pool, _, _, _, tickSpacing = mediumPoolInitializedAtZero
-
-#     kBefore = pool.liquidity
-#     assert kBefore == expandTo18Decimals(2)
-
-#     ## add liquidity at and below current tick
-#     liquidityDelta = expandTo18Decimals(1)
-#     lowerTick = -tickSpacing
-#     upperTick = 0
-#     pool.mintLimitOrder(TEST_TOKENS[0],accounts[0], lowerTick, upperTick, liquidityDelta)
-
-#     ## ensure virtual supply has increased appropriately
-#     kAfter = pool.liquidity
-#     assert kAfter == kBefore
-#     ## swap toward the right (just enough for the tick transition function to trigger)
-#     swapExact0For1(pool, 1, accounts[0], None)
-#     assert pool.slot0.tick == -1
-
-#     kAfterSwap = pool.liquidity
-#     assert kAfterSwap == expandTo18Decimals(3)
-
-
-# Limit orders (still uniswap tests)
+# Uniswap Limit order tests
 
 
 def test_limitSelling0For1_atTick0Thru1(mediumPoolInitializedAtZero, accounts, ledger):
@@ -1324,65 +1259,27 @@ def test_limitSelling0For1_atTick0Thru1_feesOn(
     assert finalBalance1LP == iniBalance1LP + positionSwapped + feesAccrued
 
 
-# # This doesn't make sense for LO.
+## Collect
+def test_multipleLPs(initializedLowPoolCollect, accounts):
+    print("works with multiple LPs")
+    pool, _, _, _, tickSpacing = initializedLowPoolCollect
 
-# # def test_limitSelling0For1_atTick0ThruMinus1_feesOn(
-# #     mediumPoolInitializedAtZero, accounts
-# # ):
-# #     print("limit selling 0 for 1 at tick 0 thru -1 - fees on")
-# #     pool, _, _, _, _ = mediumPoolInitializedAtZero
-# #     pool.setFeeProtocol(6, 6)
+    tick = tickSpacing
 
-# #     (amount0, amount1) = pool.mintLimitOrder(TEST_TOKENS[0],accounts[0], -120, 0, expandTo18Decimals(1))
-# #     assert amount0 == 0
-# #     assert amount1 == 5981737760509663
+    pool.mintLimitOrder(TEST_TOKENS[1], accounts[0], tick, expandTo18Decimals(1))
+    pool.mintLimitOrder(TEST_TOKENS[1], accounts[1], tick, expandTo18Decimals(2))
 
-# #     ## somebody takes the limit order
-# #     swapExact0For1(pool, expandTo18Decimals(2), accounts[0], None)
+    swapExact0For1(pool, expandTo18Decimals(1), accounts[0], None)
 
-# #     (recipient, tickLower, tickUpper, amount, amount0, amount1) = pool.burnLimitOrder(TEST_TOKENS[0],
-# #         accounts[0], -120, 0, expandTo18Decimals(1)
-# #     )
-# #     assert recipient == accounts[0]
-# #     assert tickLower == -120
-# #     assert tickUpper == 0
-# #     assert amount == expandTo18Decimals(1)
-# #     assert amount0 == 6017734268818165
-# #     assert amount1 == 0
+    ## poke limitOrders
+    pool.burnLimitOrder(TEST_TOKENS[1], accounts[0], tick, 0)
+    pool.burnLimitOrder(TEST_TOKENS[1], accounts[1], tick, 0)
 
-# #     (recipient, _, _, amount0, amount1) = pool.collect(
-# #         accounts[0], -120, 0, MAX_UINT128, MAX_UINT128
-# #     )
-# #     assert recipient == accounts[0]
-# #     assert (
-# #         amount0 == 6017734268818165 + 15089604485501
-# #     )  ## roughly 0.25% despite other liquidity
-# #     assert amount1 == 0
+    position0 = pool.limitOrders[getLimitPositionKey(accounts[0], tick, False)]
+    position1 = pool.limitOrders[getLimitPositionKey(accounts[1], tick, False)]
 
-# #     assert pool.slot0.tick <= -120
-
-
-# ## Collect
-# def test_multipleLPs(initializedLowPoolCollect, accounts):
-#     print("works with multiple LPs")
-#     pool, _, _, _, tickSpacing = initializedLowPoolCollect
-
-#     tick = tickSpacing
-
-#     pool.mintLimitOrder(TEST_TOKENS[1], accounts[0], tick, expandTo18Decimals(1))
-#     pool.mintLimitOrder(TEST_TOKENS[1], accounts[1], tick, expandTo18Decimals(2))
-
-#     swapExact0For1(pool, expandTo18Decimals(1), accounts[0], None)
-
-#     ## poke limitOrders
-#     pool.burnLimitOrder(TEST_TOKENS[1], accounts[0], tick, 0)
-#     pool.burnLimitOrder(TEST_TOKENS[1], accounts[1], tick, 0)
-
-#     position0 = pool.limitOrders[getLimitPositionKey(accounts[0], tick, False)]
-#     position1 = pool.limitOrders[getLimitPositionKey(accounts[1], tick, False)]
-
-#     assert position0.tokensOwed0 == 166666666666666
-#     assert position1.tokensOwed0 == 333333333333333
+    assert position0.tokensOwed0 == 166666666666666
+    assert position1.tokensOwed0 == 333333333333333
 
 
 ## Works accross large increases
@@ -2082,40 +1979,6 @@ def test_swapGaps_zeroForOne(initializedPoolMedium12TickSpacing, accounts):
 
     # Tick should not have changed
     assert pool.slot0.tick == -150000
-
-
-# Doesn't make sense with limit orders
-
-# ## https://github.com/Uniswap/uniswap-v3-core/issues/214
-# def test_noTickTransitionTwice(accounts):
-#     print(
-#         "tick transition cannot run twice if zero for one swap ends at fractional price just below tick"
-#     )
-#     pool, _, _, _, _ = createPool(FeeAmount.MEDIUM, 1, ledger)
-
-#     p0 = TickMath.getSqrtRatioAtTick(-24081) + 1
-#     ## initialize at a price of ~0.3 token1/token0
-#     ## meaning if you swap in 2 token0, you should end up getting 0 token1
-#     pool.initialize(p0)
-#     assert pool.liquidity == 0, "current pool liquidity is 1"
-#     assert pool.slot0.tick == -24081, "pool tick is -24081"
-
-#     ## add a bunch of liquidity around current price
-#     liquidity = expandTo18Decimals(1000)
-#     pool.mintLimitOrder(TEST_TOKENS[0],accounts[0], -24082, -24080, liquidity)
-#     assert pool.liquidity == liquidity, "current pool liquidity is now liquidity + 1"
-
-#     pool.mintLimitOrder(TEST_TOKENS[0],accounts[0], -24082, -24081, liquidity)
-#     assert pool.liquidity == liquidity, "current pool liquidity is still liquidity + 1"
-
-#     ## check the math works out to moving the price down 1, sending no amount out, and having some amount remaining
-#     (sqrtQ, amountIn, amountOut, feeAmount) = SwapMath.computeSwapStep(
-#         p0, p0 - 1, liquidity, 3, FeeAmount.MEDIUM
-#     )
-#     assert sqrtQ == p0 - 1, "price moves"
-#     assert feeAmount == 1, "fee amount is 1"
-#     assert amountIn == 1, "amount in is 1"
-#     assert amountOut == 0, "zero amount out"
 
 
 # setFeeProtocol

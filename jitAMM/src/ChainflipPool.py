@@ -40,7 +40,7 @@ class ChainflipPool(UniswapPool):
         # Pass all paramaters to UniswapPool's constructor
         super().__init__(token0, token1, fee, tickSpacing, ledger)
 
-    ### @dev Checks for valid tick inputs.
+    ### @dev Checks for valid limit tick inputs.
     def checkTick(tick):
         checkInputTypes(int24=(tick))
         # Check that priceTick > 0 to simplify edge cases (this happens because pricex96 can be zero
@@ -48,6 +48,16 @@ class ChainflipPool(UniswapPool):
         assert tick >= MIN_TICK_LO, "TLM"
         assert tick <= MAX_TICK_LO, "TUM"
 
+    ## @notice Adds liquidity for the given recipient/tick/token position
+    ## @dev The final amounts calculated are automatically transferred from the swapper
+    ## to the pool and vice verse. The amount of liquidity minted should
+    ## @param recipient The address for which the liquidity will be created
+    ## @param tick The tick of the position in which to add liquidity
+    ## @param token The token for which to add liquidity
+    ## @param amount The amount of liquidity to mint, which should match exactly the amount of tokens
+    ## that will be transferred from the user to the pool.
+    ## @return amount The amount of token0 that was paid to mint the given amount of liquidity. The absolute
+    ## value should match the function's call amount.
     def mintLimitOrder(self, token, recipient, tick, amount):
         checkInputTypes(
             string=token,
@@ -80,6 +90,12 @@ class ChainflipPool(UniswapPool):
 
         return amountIn
 
+    ## @dev Effect some changes to a position
+    ## @param params the position details and the change to the position's liquidity to effect
+    ## @param token The position's token
+    ## @return position a storage pointer referencing the position with the given owner and tick range
+    ## @return liquidityLeftDelta Change in liquidity's position left in token.
+    ## @return liquiditySwappedDelta Change in liquidity's position already swapped in token pair.
     def _modifyPositionLimitOrder(self, token, params):
         checkInputTypes(
             string=token,
@@ -103,6 +119,14 @@ class ChainflipPool(UniswapPool):
 
         return position, liquidityLeftDelta, liquiditySwappedDelta
 
+    ### @dev Gets and updates a limit position with the given liquidity delta
+    ## @param token The position's token
+    ### @param owner the owner of the position
+    ## @param tick The position's tick
+    ## @param liquidityDelta The position's liquidity delta
+    ### @return position A reference to the updated position
+    ## @return liquidityLeftDelta Change in liquidity's position left in token.
+    ## @return liquiditySwappedDelta Change in liquidity's position already swapped in token pair.
     def _updatePositionLimitOrder(self, token, owner, tick, liquidityDelta):
         checkInputTypes(
             string=token,
@@ -161,8 +185,19 @@ class ChainflipPool(UniswapPool):
                 ticksLimitMap[tick].ownerPositions.remove(owner)
         return position, liquidityLeftDelta, liquiditySwappedDelta
 
-    # This can only be run if the tick has only been partially crossed (or not used). If fully crossed, the positions
-    # will have been burnt automatically.
+    ## @notice Burn liquidity from the sender and account tokens owed for the liquidity to the position
+    ## @dev This can only be run if the tick has only been partially crossed (or not used). If fully crossed,
+    ## the position will have been burnt automatically.
+    ## @dev Can be used to trigger a recalculation of fees owed to a position by calling with an amount of 0
+    ## @dev If a position is fully burnt this way, it will be automatically collected and transferred
+    ## to the owner (both tokens owed due to liquidity and/or fees)
+    ## @param tick The position's tick
+    ## @param recipient The position's owner.
+    ## @param amount How much liquidity to burn
+    ## @return amountBurnt0 The amount of token0 sent to the recipient due to the position's burn.
+    ## @return amountBurnt1 The amount of token1 sent to the recipient due to the position's burn.
+    ## @dev If position is fully burnt, all the tokens owed will be collected and added to the
+    ## returned values amountBurnt0 and amountBurnt1.
     def burnLimitOrder(self, token, recipient, tick, amount):
         checkInputTypes(
             string=token,
@@ -219,6 +254,21 @@ class ChainflipPool(UniswapPool):
 
     ## Collect a limit Order. This can only be called for positions that have not been swapped or that have been
     ## partially swapped. If the position has been fully swapped, the position will have been burnt together with the tick.
+
+    ## @notice Collects tokens owed to a position. This can only be called for positions that have not been swapped
+    ## or that have been partially swapped. If the position has been fully swapped, the position will have been burnt
+    ## together with the tick and collected.
+    ## @dev Does not recompute fees earned, which must be done either via mint or burn of any amount of liquidity.
+    ## Collect must be called by the position owner. To withdraw only token0 or only token1, amount0Requested or
+    ## amount1Requested may be set to zero. To withdraw all tokens owed, caller may pass any value greater than the
+    ## actual tokens owed, e.g. type(uint128).max. Tokens owed may be from accumulated swap fees or burned liquidity.
+    ## @param recipient The address which should receive the fees collected
+    ## @param tick The tick of the position for which to collect fees
+    ## @param token The token of the position for which to collect fees
+    ## @param amount0Requested How much token0 should be withdrawn from the fees owed
+    ## @param amount1Requested How much token1 should be withdrawn from the fees owed
+    ## @return amountPos0 The amount of fees collected in token0
+    ## @return amountPos1 The amount of fees collected in token1
     def collectLimitOrder(
         self,
         recipient,
@@ -278,7 +328,18 @@ class ChainflipPool(UniswapPool):
         # return (recipient, tick, amount0, amount1, amountPos0, amountPos1)
         return (recipient, tick, amountPos0, amountPos1)
 
-    # Overriding UniswapPool's swap function to accomodate for Limit Orders during the swap flow.
+    ## @notice Swap token0 for token1, or token1 for token0
+    ## @dev Overriding completely the UniswapPool's swap function to accomodate for Limit Orders during the swap flow.
+    ## @dev Limit Orders have the ability to provide better prices than range orders. Therefore, the swap flow first
+    ## checks for the existance of better priced limit orders and them moves onto range orders.
+    ## @dev The tokens are automatically transferred at the end of the swapping function.
+    ## @param recipient The address to receive the output of the swap
+    ## @param zeroForOne The direction of the swap, true for token0 to token1, false for token1 to token0
+    ## @param amountSpecified The amount of the swap, which implicitly configures the swap as exact input (positive), or exact output (negative)
+    ## @param sqrtPriceLimitX96 The Q64.96 sqrt price limit. If zero for one, the price cannot be less than this
+    ## value after the swap. If one for zero, the price cannot be greater than this value after the swap
+    ## @return amount0 The delta of the balance of token0 of the pool, exact when negative, minimum when positive
+    ## @return amount1 The delta of the balance of token1 of the pool, exact when negative, minimum when positive
     def swap(self, recipient, zeroForOne, amountSpecified, sqrtPriceLimitX96):
         checkInputTypes(
             accounts=(recipient),
@@ -600,10 +661,14 @@ class ChainflipPool(UniswapPool):
             state.tick,
         )
 
-    # Called at the end of the swap for all the crossed ticks. Burns all the crossed ticks and their
-    # underdlying positions. This could be done in a more efficient way by creating a function that burns
-    # all the positions without altering the tick and then burning the tick at the end. But here we are
-    # just reusing the burnLimitOrder for simplicity.
+    ## @notice Burns a tick and all their underlying positions. This is called at the end of a swap
+    ## to burn and collect all the crossed ticks and positions.
+    ## @dev This could be done in a more efficient way by creating a function that burns
+    ## all the positions without altering the tick and then burning the tick at the end. But here we are
+    ## just reusing the burnLimitOrder for simplicity.
+    ## @param Tick Rick to burn and collect
+    ## @param tickLimitInfo Reference to the tick Info of the tick to burn and collect
+    ## @param token Tick's token
     def burnCrossedTicksAndPositions(self, tickLimitInfo, tick, token):
         checkInputTypes(string=(token), int24=(tick))
         assert tickLimitInfo[tick].oneMinusPercSwap == 0
@@ -627,26 +692,21 @@ class ChainflipPool(UniswapPool):
         assert not tickLimitInfo.__contains__(tick)
 
 
-# Find the next linearTick (all should have oneMinusPercSwap > 0). Since we look for the next tick in every swap loop
-# there might be crossed ticks from the previous swap loops. Therefore we must check for crossed ticks and return
-# only the next tick with oneMinusPercSwap > 0
-# Returning initialized bool signaling whether it should be used or not.
-# NOTE: This is probably not the best efficient way, but this probably will be done very differently in the real AMM
-# smart contract implementation anyway. Functionality should be equivalent and it's alright for this model.
+## @notice Get the next limit tick containing limit orders with liquidity (oneMinusPercSwap > 0).
+## @dev We are fetching for the next tick in every swap loop. Since the ticks don't get burnt until the end
+## of the swap, we will find some LO ticks that have been previously swapped. Therefore we need to get only
+## the LO ticks with oneMinusPercSwap > 0.
+## @dev Returning a bool signaling whether it should be used or not (better price than the RO pool)
+## @dev This might not be the most efficient flow but this is just for modeling.
+## @param tickMapping Mapping of all the ticks that can potentially be used in the current swap.
+## @param lte Whether to search for the next initialized tick to the left (less than or equal to the starting tick)
+## @param currentTick Current tick of the pool's state.
 def nextLimitTick(tickMapping, lte, currentTick):
     checkInputTypes(bool=(lte), int24=(currentTick))
 
-    # NOTE: We are fetching for the next tick in every swap loop. Since the ticks don't get burnt until the end
-    # of the swap, we will find some LO ticks that have been previously swapped. Therefore we need to get only
-    # the LO ticks with oneMinusPercSwap > 0.
-
     # Dictionary with ticks that have oneMinusPercSwap > 0
     dictTicksWithLiq = {
-        # k: v
-        # for k, v in tickMapping.items()
-        k: v
-        for k, v in tickMapping.items()
-        if tickMapping[k].oneMinusPercSwap > 0
+        k: v for k, v in tickMapping.items() if tickMapping[k].oneMinusPercSwap > 0
     }
 
     keysLimitTicks = sorted(list(dictTicksWithLiq.keys()))
