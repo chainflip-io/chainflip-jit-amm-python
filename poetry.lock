@@ -49,15 +49,15 @@ importlib-metadata = {version = "*", markers = "python_version < \"3.8\""}
 
 [[package]]
 name = "colorama"
-version = "0.4.5"
+version = "0.4.6"
 description = "Cross-platform colored terminal text."
 category = "main"
 optional = false
-python-versions = ">=2.7, !=3.0.*, !=3.1.*, !=3.2.*, !=3.3.*, !=3.4.*"
+python-versions = "!=3.0.*,!=3.1.*,!=3.2.*,!=3.3.*,!=3.4.*,!=3.5.*,!=3.6.*,>=2.7"
 
 [[package]]
 name = "exceptiongroup"
-version = "1.0.0rc9"
+version = "1.0.0"
 description = "Backport of PEP 654 (exception groups)"
 category = "main"
 optional = false
@@ -248,20 +248,15 @@ python-versions = ">=3.7"
 
 [[package]]
 name = "uniswapv3python"
-version = "0.0.2"
+version = "1.0.0"
 description = "Pythonized Uniswap V3"
 category = "main"
 optional = false
 python-versions = ">=3.7"
 
-[package.source]
-type = "legacy"
-url = "https://test.pypi.org/simple"
-reference = "uniswapV3Python"
-
 [[package]]
 name = "zipp"
-version = "3.9.0"
+version = "3.10.0"
 description = "Backport of pathlib-compatible object wrapper for zip files"
 category = "main"
 optional = false
@@ -274,7 +269,7 @@ testing = ["pytest (>=6)", "pytest-checkdocs (>=2.4)", "pytest-flake8", "flake8 
 [metadata]
 lock-version = "1.1"
 python-versions = ">=3.7.3, <3.10"
-content-hash = "754f39febdb323781ba9a46f8d7c139d8190b9a1036b6be3a9bc1eeec5c61459"
+content-hash = "4be813b6720dfc7c6b4ef4a8c881b2500ed27cc02be8f51f1d76f8c3e7372fdb"
 
 [metadata.files]
 attrs = []
@@ -297,8 +292,5 @@ sortedcontainers = []
 tomli = []
 typed-ast = []
 typing-extensions = []
-uniswapv3python = [
-    {file = "uniswapV3Python-0.0.2-py3-none-any.whl", hash = "sha256:55008087c470d86e68fa4294be0d7beb109752ae42e3e0f715a07d9e1b7646fb"},
-    {file = "uniswapV3Python-0.0.2.tar.gz", hash = "sha256:5a50296246c17ed4588ef4ebf83db8ac2fd04603f7bb032a0b6699827849de09"},
-]
+uniswapv3python = []
 zipp = []
